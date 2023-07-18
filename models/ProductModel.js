@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 
-
 const ProductSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -24,8 +23,11 @@ const ProductSchema = new mongoose.Schema({
         minlength: [30, "Description should not be less than 30 characters"],
         trim: true,
         required: [true, 'Please provide the Description of your product']
+    },
+    category: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Category'
     }
-
 })
 
 
