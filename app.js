@@ -5,8 +5,12 @@ const morgan = require('morgan')
 const app = express();
 
 
-const productController = require('./controllers/ProductController')
 const productRouter = require('./routes/ProductRoutes')
+const categoryRouter = require('./routes/CategoryRoutes')
+
+
+const productController = require('./controllers/ProductController')
+
 const globalErrorHandler = require('./controllers/ErrorController');
 const AppError = require('./utils/AppError');
 
@@ -22,7 +26,7 @@ app.use('/api/v1/products', productRouter);
 
 
 
-
+app.use('/api/v1/categories', categoryRouter);
 
 
 

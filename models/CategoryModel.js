@@ -13,7 +13,6 @@ const CategorySchema = new mongoose.Schema({
         type: String,
         default: "",
         maxlength: [50, "Description should be less than 12 characters"],
-        minlength: [3, "Description must have at least three character"],
         trim: true
     }
 });

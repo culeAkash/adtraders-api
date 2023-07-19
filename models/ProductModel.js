@@ -26,8 +26,21 @@ const ProductSchema = new mongoose.Schema({
     },
     category: {
         type: mongoose.Schema.ObjectId,
-        ref: 'Category'
+        ref: 'Category',
+        required: [true, "A product must belong to a category"]
     }
+})
+
+
+
+
+ProductSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'category',
+        select: '-__v'
+    })
+
+    next();
 })
 
 
