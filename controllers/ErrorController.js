@@ -45,7 +45,7 @@ module.exports = (error, req, res, next) => {
 
     if (error.isOperational) {
         res.status(error.statusCode).json({
-            status: error.statusCode,
+            status: error.status,
             message: error.message
         })
     }

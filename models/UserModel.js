@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator')
+const bcryptjs = require('bcryptjs')
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -20,19 +21,14 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'Please provide password'],
         minlength: 8,
         select: false
-    },
-    passwordConfirm: {
-        type: String,
-        required: [true, 'Please confirm your password'],
-        validate: {
-            // This only works when we create or save user to database and not on update
-            validator: function (val) {
-                return val === this.password;
-            },
-            message: 'Passwords do not match'
-        }
     }
 });
+
+
+UserSchema.methods.comparePassword = async function (comparePassword, userPassword) {
+    return await bcryptjs.compare(comparePassword, userPassword);
+}
+
 
 const User = mongoose.model('User', UserSchema);
 
