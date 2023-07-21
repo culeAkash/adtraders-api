@@ -3,6 +3,7 @@ const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/CatchAsync");
 
 const jwt = require('jsonwebtoken')
+const { promisify } = require('util')
 
 
 const signtoken = (userId) => {
@@ -17,7 +18,7 @@ const generateTokenAndCookie = (user, res) => {
     // cookie options
 
     const cookieOptions = {
-        expires: new Date(Date.now() + 1000),
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
         httpOnly: true,
         secure: true
     }
@@ -61,14 +62,19 @@ exports.login = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         status: 'success',
-        // accessToken
+        accessToken
     })
 })
 
 
 exports.authenticate = catchAsync(async (req, res, next) => {
 
-    const token = req.cookies.accessToken;
+
+    let token;
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
 
 
     if (!token) {
@@ -82,12 +88,12 @@ exports.authenticate = catchAsync(async (req, res, next) => {
     console.log(decodedToken.userId);
 
 
-
-    res.status(200).json({
-        message: 'successfully authenticated'
-    })
+    const freshUser = User.findById(decodedToken.userId);
 
 
+    req.user = freshUser
+
+    next();
 
 
 })

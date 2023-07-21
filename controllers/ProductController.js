@@ -48,7 +48,10 @@ exports.createProduct = catchAsync(async (req, res, next) => {
     console.log(newProduct);
 
     res.status(201).json({
-        status: 'success'
+        status: 'success',
+        data: {
+            product: newProduct
+        }
     })
 })
 

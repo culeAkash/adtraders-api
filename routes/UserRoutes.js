@@ -11,8 +11,8 @@ const authController = require('../controllers/AuthController')
 
 
 
-router.route("/auth")
-    .get(authController.authenticate)
+// router.route("/auth")
+//     .get(authController.authenticate)
 
 
 router.route("/login")
