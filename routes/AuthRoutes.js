@@ -7,6 +7,7 @@ const router = express.Router()
 
 
 const authController = require('../controllers/AuthController')
+const refreshController = require('../controllers/RefreshController')
 
 
 
@@ -17,6 +18,8 @@ const authController = require('../controllers/AuthController')
 
 router.route("/login")
     .post(authController.login)
+
+router.route("/refresh").get(refreshController.handleRefreshToken)
 
 
 

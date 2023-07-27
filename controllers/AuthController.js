@@ -6,30 +6,10 @@ const jwt = require('jsonwebtoken')
 const { promisify } = require('util')
 
 
-const signtoken = (userId) => {
-    return jwt.sign({ userId }, process.env.JWT_SECRET_KEY, {
-        expiresIn: process.env.JWT_EXPIRES_IN
+const signtoken = (userId, secret, expire) => {
+    return jwt.sign({ userId }, secret, {
+        expiresIn: expire
     });
-}
-
-
-const generateTokenAndCookie = (user, res) => {
-
-    // cookie options
-
-    const cookieOptions = {
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-        httpOnly: true,
-        secure: true
-    }
-
-    const accessToken = signtoken(user._id);
-
-    res.cookie("accessToken", accessToken, cookieOptions);
-
-    user.password = undefined;
-
-    return accessToken;
 }
 
 
@@ -55,10 +35,29 @@ exports.login = catchAsync(async (req, res, next) => {
     if (!await user.comparePassword(password, user.password))
         return next(new AppError("Password is incorrect", 401));
 
+    const userId = user._id;
+
     // create token
-    let accessToken = generateTokenAndCookie(user, res);
+    const accessToken = signtoken(userId, process.env.JWT_SECRET_KEY, process.env.JWT_EXPIRES_IN);
+
+    //create refresh token
+    const refreshToken = signtoken(userId, process.env.JWT_REFRESH_TOKEN_SECRET_KEY, process.env.JWT_REFRESH_TOKEN_EXPIRES_IN);
+
+    user.refreshToken = refreshToken;
+
+    const result = await user.save();
+
+    console.log(result);
 
     // console.log(accessToken);
+
+    //save the access token to secure cookie
+    res.cookie('jwt', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+        maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    })
 
     res.status(200).json({
         status: 'success',
